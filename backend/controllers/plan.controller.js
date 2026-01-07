@@ -1,16 +1,17 @@
 const UserModel = require('../models/user.model');
+const { createError } = require('../utils/response');
 
-exports.list = async (_req, res) => {
+exports.list = async (_req, res, next) => {
   try {
     const data = await UserModel.getPlanDetails();
     return res.status(200).send({ success: true, data });
-  } catch (_e) {
-    return res.status(200).send({ success: false, msg: 'Internal error' });
+  } catch (error) {
+    next(createError('Internal error', 500));
   }
 };
 
-exports.detail = async (_req, res) => {
-  return res.status(200).send({ success: false, msg: 'Not implemented' });
+exports.detail = async (_req, res, next) => {
+  next(createError('Not implemented', 501));
 };
 
 

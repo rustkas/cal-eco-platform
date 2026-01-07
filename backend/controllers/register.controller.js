@@ -12,7 +12,7 @@ try {
   Web3 = null;
 }
 const { verifyWalletAddress, isAddressBlocked } = require('../utils/wallet');
-const { successResponse, errorResponse, validationErrorResponse, forbiddenResponse } = require('../utils/response');
+const { successResponse, errorResponse, validationErrorResponse, forbiddenResponse, createError } = require('../utils/response');
 const logger = require('../utils/logger');
 
 const KEY_SIZE = 256;
@@ -137,7 +137,7 @@ exports.userRegister = async (req, res) => {
 
 
 
-exports.getTransactionHistory = async (req, res) => {
+exports.getTransactionHistory = async (req, res, next) => {
     try {
         req.body.user_id = req.user_id
         let getTransactionDetail = await UserModel.getTransactionHistory(req.body);
@@ -157,15 +157,11 @@ exports.getTransactionHistory = async (req, res) => {
         }
 
     } catch (err) {
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(createError('Internal error', 500));
     }
 }
 
-exports.getWithdrawHistory = async (req, res) => {
+exports.getWithdrawHistory = async (req, res, next) => {
     try {
 
         req.body.user_id = req.user_id;
@@ -186,11 +182,7 @@ exports.getWithdrawHistory = async (req, res) => {
         }
 
     } catch (err) {
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(createError('Internal error', 500));
     }
 }
 
@@ -217,15 +209,11 @@ exports.getReferralUsersList = async (req, res, next) => {
         }
 
     } catch (err) {
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(createError('Internal error', 500));
     }
 }
 
-exports.getPlanDetails = async (req, res) => {
+exports.getPlanDetails = async (req, res, next) => {
     try {
 
         let getplandetail = await UserModel.getPlanDetails();
@@ -247,16 +235,12 @@ exports.getPlanDetails = async (req, res) => {
         }
 
     } catch (err) {
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(createError('Internal error', 500));
     }
 }
 
 
-exports.depositBUSD = async (req, res) => {
+exports.depositBUSD = async (req, res, next) => {
     try {
         req.body.user_id = req.user_id;
         req.body.address = req.address;
@@ -289,16 +273,12 @@ exports.depositBUSD = async (req, res) => {
         }
 
     } catch (err) {
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(createError('Internal error', 500));
     }
 }
 
 
-exports.addStaking = async (req, res) => {
+exports.addStaking = async (req, res, next) => {
     try {
 
         req.body.user_id = req.user_id;
@@ -336,12 +316,7 @@ exports.addStaking = async (req, res) => {
             }
         }
     } catch (err) {
-        console.log('err', err)
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(createError('Internal error', 500));
     }
 }
 
@@ -358,7 +333,7 @@ exports.usersStakingIncome = async () => {
 
 
 
-exports.getStakingHistory = async (req, res) => {
+exports.getStakingHistory = async (req, res, next) => {
     try {
         //
         req.body.user_id = req.user_id;
@@ -379,11 +354,7 @@ exports.getStakingHistory = async (req, res) => {
         }
 
     } catch (err) {
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(createError('Internal error', 500));
     }
 }
 
@@ -443,15 +414,11 @@ exports.SingalClaimReward = async (req, res) => {
             }
         }
     } catch (err) {
-
-        return res.status(200).send({
-            success: false,
-            msg: "Something went wrong please try again."
-        });
+        next(createError('Internal error', 500));
     }
 }
 
-exports.SellPlan = async (req, res) => {
+exports.SellPlan = async (req, res, next) => {
     try {
         req.body.user_id = req.user_id;
 
@@ -483,16 +450,11 @@ exports.SellPlan = async (req, res) => {
         }
 
     } catch (err) {
-        console.log('err', err)
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(createError('Internal error', 500));
     }
 }
 
-exports.getTotalBalance = async (req, res) => {
+exports.getTotalBalance = async (req, res, next) => {
     try {
         req.body.user_id = req.user_id;
         let totalBalanceDetail = await UserModel.getTotalBalance(req.body);
@@ -514,15 +476,11 @@ exports.getTotalBalance = async (req, res) => {
         }
 
     } catch (err) {
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(err);
     }
 }
 
-exports.getTotalInvested = async (req, res) => {
+exports.getTotalInvested = async (req, res, next) => {
     try {
 
         let totalinvastedDetail = await UserModel.getTotalInvested();
@@ -543,11 +501,7 @@ exports.getTotalInvested = async (req, res) => {
         }
 
     } catch (err) {
-        return res.status(200).send({
-            success: false,
-            msg: "User not registered due to internal error",
-            err
-        });
+        next(createError('Internal error', 500));
     }
 }
 

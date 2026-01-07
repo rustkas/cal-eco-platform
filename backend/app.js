@@ -53,7 +53,25 @@ if (require.main === module) {
   server.listen(PORT, () => {
     logger.info(`Server listening on port ${PORT}`);
     logger.info(`Environment: ${config.nodeEnv}`);
+  });
+
+  // Graceful shutdown
+  const gracefulShutdown = (signal) => {
+    logger.info(`${signal} received. Shutting down gracefully...`);
+    server.close(() => {
+      logger.info('HTTP server closed.');
+      process.exit(0);
     });
+
+    // Force close after 10 seconds
+    setTimeout(() => {
+      logger.error('Forced shutdown after timeout');
+      process.exit(1);
+    }, 10000);
+  };
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
 
 module.exports = { app, server, io };

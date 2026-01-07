@@ -5,6 +5,7 @@ const ethUtil = require("ethereumjs-util");
 const ethereum_address = require("ethereum-address");
 const { response } = require("express");
 var fetch = require('node-fetch');
+const { createError } = require('../utils/response');
 
 const provider = new ethers.providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545");
 
@@ -58,7 +59,7 @@ exports.transfer = async (data) => {
   }
 }
 
-exports.getTokenBalance = async (request, response) => {
+exports.getTokenBalance = async (request, response, next) => {
   let address = request.body.address;
   let contractAddress = request.body.contract_address;
   try {
@@ -69,14 +70,11 @@ exports.getTokenBalance = async (request, response) => {
       balance: token / 10 ** decimals,
     });
   } catch (e) {
-    return response.status(400).json({
-      msg: "something went wrong",
-      e: e,
-    });
+    next(createError('Something went wrong', 500));
   }
 }
 
-exports.createWallet = async (request, response) => {
+exports.createWallet = async (request, response, next) => {
   try {
     const wallet = ethers.Wallet.createRandom();
     console.log(wallet);
@@ -89,14 +87,11 @@ exports.createWallet = async (request, response) => {
       }
     });
   } catch (e) {
-    return response.status(400).json({
-      msg: "something went wrong",
-      e: e,
-    });
+    next(createError('Something went wrong', 500));
   }
 }
 
-exports.getBalance = async (request, response) => {
+exports.getBalance = async (request, response, next) => {
   let address = request.params.address;
   try {
     const balance = await provider.getBalance(address);
@@ -107,14 +102,11 @@ exports.getBalance = async (request, response) => {
       currency: 'BNB'
     });
   } catch (e) {
-    return response.status(400).json({
-      msg: "something went wrong",
-      e: e,
-    });
+    next(createError('Something went wrong', 500));
   }
 }
 
-exports.getTransactionByAddress = async (request, response) => {
+exports.getTransactionByAddress = async (request, response, next) => {
   let fromAddress = request.body.from_address;
   let to_address = request.body.to_address;
   let amount = request.body.amount;
@@ -137,9 +129,6 @@ exports.getTransactionByAddress = async (request, response) => {
       transactions
     });
   } catch (e) {
-    return response.status(400).json({
-      msg: "something went wrong",
-      e: e,
-    });
+    next(createError('Something went wrong', 500));
   }
 }

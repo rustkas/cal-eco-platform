@@ -1,6 +1,7 @@
 const UserModel = require('../models/user.model');
+const { createError } = require('../utils/response');
 
-exports.create = async (req, res) => {
+exports.create = async (req, res, next) => {
   try {
     req.body.user_id = req.user_id;
     req.body.address = req.address;
@@ -10,21 +11,21 @@ exports.create = async (req, res) => {
     req.body.reward_token = check[0].token;
     const result = await UserModel.addStaking(req.body);
     return res.status(200).send({ success: true, id: result.insertId });
-  } catch (_e) {
-    return res.status(200).send({ success: false, msg: 'Internal error' });
+  } catch (error) {
+    next(createError('Internal error', 500));
   }
 };
 
-exports.list = async (req, res) => {
+exports.list = async (req, res, next) => {
   try {
     const data = await UserModel.getstakingHistory({ user_id: req.user_id });
     return res.status(200).send({ success: true, data });
-  } catch (_e) {
-    return res.status(200).send({ success: false, msg: 'Internal error' });
+  } catch (error) {
+    next(createError('Internal error', 500));
   }
 };
 
-exports.claim = async (req, res) => {
+exports.claim = async (req, res, next) => {
   try {
     const body = { ...req.body, user_id: req.user_id };
     const rewardCheck = await UserModel.RewardClaimCheck(body);
@@ -37,20 +38,20 @@ exports.claim = async (req, res) => {
     if (token <= 0) return res.status(200).send({ success: false, msg: 'No reward' });
     await UserModel.SingalRewardClaim({ ...body, token });
     return res.status(200).send({ success: true });
-  } catch (_e) {
-    return res.status(200).send({ success: false, msg: 'Internal error' });
+  } catch (error) {
+    next(createError('Internal error', 500));
   }
 };
 
-exports.sell = async (req, res) => {
+exports.sell = async (req, res, next) => {
   try {
     const body = { ...req.body, user_id: req.user_id };
     const check = await UserModel.checkSellPlan(body);
     if (check.length === 0) return res.status(200).send({ success: false, msg: 'Invalid staking details' });
     await UserModel.SellPlan({ ...body, reward_token: parseFloat(check[0].reward_token) * parseFloat(check[0].remaining_quantity) });
     return res.status(200).send({ success: true });
-  } catch (_e) {
-    return res.status(200).send({ success: false, msg: 'Internal error' });
+  } catch (error) {
+    next(createError('Internal error', 500));
   }
 };
 

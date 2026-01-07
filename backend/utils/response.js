@@ -31,6 +31,16 @@ const notFoundResponse = (message = 'Not found') => {
   return createResponse(false, null, message, 404);
 };
 
+// Helper to create error object for next(error) with compatible format
+const createError = (message, statusCode = 500, data = null) => {
+  const error = new Error(message);
+  error.status = statusCode;
+  error.message = message;
+  error.msg = message; // For backward compatibility
+  if (data) error.data = data;
+  return error;
+};
+
 module.exports = {
   successResponse,
   errorResponse,
@@ -39,5 +49,6 @@ module.exports = {
   forbiddenResponse,
   notFoundResponse,
   createResponse,
+  createError,
 };
 

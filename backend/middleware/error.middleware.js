@@ -1,25 +1,30 @@
 const logger = require('../utils/logger');
 
 function errorMiddleware(error, req, res, next) {
-  const { status = 500, message, data } = error;
+  const { status = 500, message, msg, data } = error;
 
-  logger.error(`Error: ${message || 'Internal server error'}`, {
+  // Use message or msg for compatibility
+  const errorMessage = message || msg || 'Internal server error';
+  const finalStatus = status === 500 && !message && !msg ? 500 : status;
+
+  logger.error(`Error: ${errorMessage}`, {
     path: req.path,
     method: req.method,
-    status,
+    status: finalStatus,
     error: error.stack,
   });
 
-  const errorMessage = status === 500 || !message ? 'Internal server error' : message;
+  const finalMessage = finalStatus === 500 && !message && !msg ? 'Internal server error' : errorMessage;
 
   const errorResponse = {
     success: false,
-        status,
-    message: errorMessage,
+    status: finalStatus,
+    message: finalMessage,
+    msg: finalMessage, // For backward compatibility with frontend
     ...(data && { data }),
   };
 
-  res.status(status).json(errorResponse);
+  res.status(finalStatus).json(errorResponse);
 }
 
 module.exports = errorMiddleware;
